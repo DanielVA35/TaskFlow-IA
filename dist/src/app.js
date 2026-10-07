@@ -1,4 +1,4 @@
-import { addTask, loadTasks, updateTask } from './task-domain.js';
+import { addTask, filterTasks, loadTasks, setTaskStatus, updateTask } from './task-domain.js';
 
 const form = document.querySelector('#task-form');
 const titleInput = document.querySelector('#title');
@@ -7,6 +7,7 @@ const taskList = document.querySelector('#task-list');
 const taskCount = document.querySelector('#task-count');
 const feedback = document.querySelector('#form-feedback');
 let editingTaskId = null;
+let activeFilter = 'todas';
 
 const priorityLabels = { baixa: 'Baixa', media: 'Média', alta: 'Alta' };
 const priorityClasses = { baixa: 'low', media: 'medium', alta: 'high' };
@@ -16,14 +17,17 @@ function escapeHtml(value) { return value.replace(/[&<>'"]/g, (char) => ({ '&': 
 
 function renderTasks() {
   const tasks = loadTasks(localStorage);
-  taskCount.textContent = tasks.length;
-  if (!tasks.length) {
-    taskList.innerHTML = '<div class="empty-state"><div class="empty-icon">☷</div><h3>Nenhuma tarefa ainda</h3><p>Comece adicionando sua primeira tarefa ao fluxo.</p></div>';
+  const visibleTasks = filterTasks(tasks, activeFilter);
+  taskCount.textContent = visibleTasks.length;
+  if (!visibleTasks.length) {
+    const message = tasks.length ? 'Nenhuma tarefa neste filtro' : 'Nenhuma tarefa ainda';
+    const hint = tasks.length ? 'Escolha outro filtro para visualizar suas tarefas.' : 'Comece adicionando sua primeira tarefa ao fluxo.';
+    taskList.innerHTML = `<div class="empty-state"><div class="empty-icon">☷</div><h3>${message}</h3><p>${hint}</p></div>`;
     return;
   }
-  taskList.innerHTML = tasks.slice().reverse().map((task) => `
-    <article class="task-item">
-      <div class="task-item-top"><span class="task-status"><i></i> Pendente</span><span class="priority-tag ${priorityClasses[task.priority] || 'medium'}">${priorityLabels[task.priority] || 'Média'}</span></div>
+  taskList.innerHTML = visibleTasks.slice().reverse().map((task) => `
+    <article class="task-item ${task.status === 'concluida' ? 'is-complete' : ''}">
+      <div class="task-item-top"><label class="completion-control"><input type="checkbox" data-status-id="${task.id}" ${task.status === 'concluida' ? 'checked' : ''} /><span>${task.status === 'concluida' ? 'Concluída' : 'Pendente'}</span></label><span class="priority-tag ${priorityClasses[task.priority] || 'medium'}">${priorityLabels[task.priority] || 'Média'}</span></div>
       <h3>${escapeHtml(task.title)}</h3>
       ${task.description ? `<p>${escapeHtml(task.description)}</p>` : ''}
       <div class="task-item-bottom"><time datetime="${task.createdAt}">Criada em ${new Date(task.createdAt).toLocaleDateString('pt-BR')}</time><button class="edit-button" type="button" data-edit-id="${task.id}">Editar</button></div>
@@ -75,11 +79,24 @@ form.addEventListener('submit', (event) => {
 });
 
 document.querySelector('#cancel-edit').addEventListener('click', cancelEdit);
+document.querySelector('.task-filters').addEventListener('click', (event) => {
+  const button = event.target.closest('[data-filter]');
+  if (!button) return;
+  activeFilter = button.dataset.filter;
+  document.querySelectorAll('[data-filter]').forEach((item) => { const active = item === button; item.classList.toggle('active', active); item.setAttribute('aria-selected', String(active)); });
+  renderTasks();
+});
 taskList.addEventListener('click', (event) => {
   const button = event.target.closest('[data-edit-id]');
   if (!button) return;
   const task = loadTasks(localStorage).find((item) => item.id === button.dataset.editId);
   if (task) setFormMode(true, task);
+});
+taskList.addEventListener('change', (event) => {
+  const control = event.target.closest('[data-status-id]');
+  if (!control) return;
+  setTaskStatus(localStorage, control.dataset.statusId, control.checked ? 'concluida' : 'pendente');
+  renderTasks();
 });
 
 renderTasks();

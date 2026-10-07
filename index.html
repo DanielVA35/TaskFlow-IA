@@ -66,6 +66,11 @@
             </div>
             <div class="status-dot" aria-hidden="true"></div>
           </div>
+          <div class="task-filters" role="tablist" aria-label="Filtrar tarefas">
+            <button class="filter-button active" type="button" role="tab" aria-selected="true" data-filter="todas">Todas</button>
+            <button class="filter-button" type="button" role="tab" aria-selected="false" data-filter="pendentes">Pendentes</button>
+            <button class="filter-button" type="button" role="tab" aria-selected="false" data-filter="concluidas">Concluídas</button>
+          </div>
           <div class="task-list" id="task-list" aria-live="polite"></div>
         </section>
       </section>

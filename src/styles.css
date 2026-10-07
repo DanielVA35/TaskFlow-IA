@@ -25,3 +25,11 @@ input[type=text],textarea { width:100%; border:1px solid var(--line); border-rad
 .task-item-bottom { display:flex; align-items:center; justify-content:space-between; }
 .edit-button { border:0; padding:4px 0; color:var(--green); background:transparent; cursor:pointer; font:700 10px Manrope,sans-serif; }
 .edit-button:hover { text-decoration:underline; }
+.task-filters { display:flex; gap:6px; margin:-8px 0 18px; padding:4px; border-radius:10px; background:#f2f7f5; }
+.filter-button { flex:1; border:0; border-radius:7px; padding:8px 10px; color:#82908c; background:transparent; cursor:pointer; font:600 10px Manrope,sans-serif; }
+.filter-button:hover,.filter-button.active { color:var(--green-dark); background:white; box-shadow:0 2px 6px rgba(35,61,54,.08); }
+.completion-control { display:flex; align-items:center; gap:6px; color:#7d8986; cursor:pointer; font:10px 'DM Mono',monospace; text-transform:uppercase; }
+.completion-control input { width:14px; height:14px; accent-color:var(--green); cursor:pointer; }
+.task-item.is-complete h3 { color:#84918d; text-decoration:line-through; }
+.task-item.is-complete p { color:#a5afac; }
+.task-item.is-complete .task-status i { background:#6eb49f; }

@@ -1,5 +1,12 @@
 export const STORAGE_KEY = 'taskflow-ia.tasks';
 export const PRIORITIES = ['baixa', 'media', 'alta'];
+export const STATUSES = ['pendente', 'concluida'];
+
+export function filterTasks(tasks, filter = 'todas') {
+  if (filter === 'pendentes') return tasks.filter((task) => task.status === 'pendente');
+  if (filter === 'concluidas') return tasks.filter((task) => task.status === 'concluida');
+  return tasks;
+}
 
 export function createTask(input, now = new Date()) {
   const title = String(input.title ?? '').trim();
@@ -53,4 +60,15 @@ export function updateTask(storage, id, input) {
   next[index] = updated;
   saveTasks(storage, next);
   return updated;
+}
+
+export function setTaskStatus(storage, id, status) {
+  if (!STATUSES.includes(status)) throw new Error('Status inválido.');
+  const tasks = loadTasks(storage);
+  const index = tasks.findIndex((task) => task.id === id);
+  if (index === -1) throw new Error('Tarefa não encontrada.');
+  const next = tasks.slice();
+  next[index] = { ...tasks[index], status };
+  saveTasks(storage, next);
+  return next[index];
 }
