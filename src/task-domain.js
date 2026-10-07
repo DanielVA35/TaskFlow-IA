@@ -41,3 +41,16 @@ export function addTask(storage, input, now) {
   saveTasks(storage, [...tasks, task]);
   return task;
 }
+
+export function updateTask(storage, id, input) {
+  const tasks = loadTasks(storage);
+  const index = tasks.findIndex((task) => task.id === id);
+  if (index === -1) throw new Error('Tarefa não encontrada.');
+  const current = tasks[index];
+  const validated = createTask(input, new Date(current.createdAt));
+  const updated = { ...current, title: validated.title, description: validated.description, priority: validated.priority };
+  const next = tasks.slice();
+  next[index] = updated;
+  saveTasks(storage, next);
+  return updated;
+}

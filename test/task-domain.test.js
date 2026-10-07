@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { addTask, createTask, loadTasks, PRIORITIES, STORAGE_KEY } from '../src/task-domain.js';
+import { addTask, createTask, loadTasks, PRIORITIES, STORAGE_KEY, updateTask } from '../src/task-domain.js';
 
 function storage() { const data = new Map(); return { getItem: (key) => data.get(key) ?? null, setItem: (key, value) => data.set(key, value) }; }
 
@@ -8,3 +8,5 @@ test('cadastra uma tarefa válida com valores normalizados', () => { const task 
 test('rejeita título vazio e limites inválidos', () => { assert.throws(() => createTask({ title: '   '}), /título/); assert.throws(() => createTask({ title: 'a'.repeat(101)}), /100/); assert.throws(() => createTask({ title: 'ok', description: 'a'.repeat(501)}), /500/); });
 test('usa média como padrão e aceita apenas prioridades permitidas', () => { assert.equal(createTask({ title: 'Tarefa' }).priority, 'media'); for (const priority of PRIORITIES) assert.equal(createTask({ title: 'Tarefa', priority }).priority, priority); assert.throws(() => createTask({ title: 'Tarefa', priority: 'urgente' }), /prioridade/); });
 test('persiste tarefas, cria IDs únicos e preserva anteriores', () => { const store = storage(); const first = addTask(store, { title: 'Primeira' }, new Date('2026-01-01')); const second = addTask(store, { title: 'Segunda' }, new Date('2026-01-02')); const tasks = loadTasks(store); assert.equal(tasks.length, 2); assert.notEqual(first.id, second.id); assert.equal(tasks[0].status, 'pendente'); assert.equal(JSON.parse(store.getItem(STORAGE_KEY)).length, 2); });
+test('edita somente a tarefa selecionada e preserva metadados', () => { const store = storage(); const first = addTask(store, { title: 'Primeira' }, new Date('2026-01-01')); const second = addTask(store, { title: 'Segunda', priority: 'alta' }, new Date('2026-01-02')); const updated = updateTask(store, first.id, { title: '  Atualizada  ', description: 'Detalhes', priority: 'baixa' }); const tasks = loadTasks(store); assert.equal(updated.id, first.id); assert.equal(updated.createdAt, first.createdAt); assert.equal(updated.status, 'pendente'); assert.equal(updated.title, 'Atualizada'); assert.equal(updated.priority, 'baixa'); assert.deepEqual(tasks[1], second); });
+test('rejeita edição inválida sem alterar a tarefa', () => { const store = storage(); const task = addTask(store, { title: 'Original' }); assert.throws(() => updateTask(store, task.id, { title: '   ', priority: 'media' }), /título/); assert.equal(loadTasks(store)[0].title, 'Original'); });
