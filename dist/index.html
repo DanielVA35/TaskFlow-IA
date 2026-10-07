@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Gerenciador simples de tarefas do TaskFlow IA" />
+    <title>TaskFlow IA</title>
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Organize o que importa</p>
+          <h1>TaskFlow <span>IA</span></h1>
+          <p class="hero-copy">Cadastre suas tarefas e mantenha seu dia em movimento.</p>
+        </div>
+        <div class="hero-mark" aria-hidden="true">✓</div>
+      </header>
+
+      <section class="content-grid" aria-label="Cadastro e lista de tarefas">
+        <section class="card form-card" aria-labelledby="form-title">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">Nova tarefa</p>
+              <h2 id="form-title">O que precisa ser feito?</h2>
+            </div>
+            <span class="step-badge">01</span>
+          </div>
+
+          <form id="task-form" novalidate>
+            <div class="field-group">
+              <label for="title">Título <span aria-hidden="true">*</span></label>
+              <input id="title" name="title" type="text" maxlength="100" required placeholder="Ex.: Preparar apresentação" autocomplete="off" />
+              <div class="field-meta"><span class="field-error" id="title-error" role="alert"></span><span id="title-count">0/100</span></div>
+            </div>
+
+            <div class="field-group">
+              <label for="description">Descrição <span class="optional">(opcional)</span></label>
+              <textarea id="description" name="description" maxlength="500" rows="4" placeholder="Adicione mais detalhes sobre esta tarefa..."></textarea>
+              <div class="field-meta"><span class="field-error" id="description-error" role="alert"></span><span id="description-count">0/500</span></div>
+            </div>
+
+            <fieldset class="field-group priority-group">
+              <legend>Prioridade</legend>
+              <div class="priority-options">
+                <label class="priority-option priority-low"><input type="radio" name="priority" value="baixa" /><span>Baixa</span></label>
+                <label class="priority-option priority-medium"><input type="radio" name="priority" value="media" checked /><span>Média</span></label>
+                <label class="priority-option priority-high"><input type="radio" name="priority" value="alta" /><span>Alta</span></label>
+              </div>
+            </fieldset>
+
+            <div class="form-footer">
+              <p class="required-note"><span aria-hidden="true">*</span> Campos obrigatórios</p>
+              <button class="primary-button" type="submit"><span aria-hidden="true">+</span> Adicionar tarefa</button>
+            </div>
+            <p class="form-feedback" id="form-feedback" role="status" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <section class="card list-card" aria-labelledby="list-title">
+          <div class="section-heading list-heading">
+            <div>
+              <p class="section-kicker">Seu fluxo</p>
+              <h2 id="list-title">Tarefas cadastradas <span class="task-count" id="task-count">0</span></h2>
+            </div>
+            <div class="status-dot" aria-hidden="true"></div>
+          </div>
+          <div class="task-list" id="task-list" aria-live="polite"></div>
+        </section>
+      </section>
+      <footer>TaskFlow IA <span>•</span> Etapa 1 — Cadastro de tarefas</footer>
+    </main>
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>
